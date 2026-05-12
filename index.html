@@ -1,0 +1,578 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>AI 교육 탐색 및 학교장의 전략적 리더십 — 퀴즈</title>
+<style>
+  :root {
+    --bg: #0f172a;
+    --card: #1e293b;
+    --card2: #334155;
+    --text: #f1f5f9;
+    --sub: #94a3b8;
+    --accent: #38bdf8;
+    --correct: #22c55e;
+    --wrong: #ef4444;
+    --warn: #f59e0b;
+    --border: #475569;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo",
+      "Pretendard", "Segoe UI", Roboto, "Noto Sans KR", sans-serif;
+    background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.6;
+    padding: 20px;
+  }
+  .container {
+    max-width: 820px;
+    margin: 0 auto;
+  }
+  header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  header h1 {
+    font-size: 1.5rem;
+    margin: 0 0 6px;
+    color: var(--accent);
+  }
+  header p {
+    margin: 0;
+    color: var(--sub);
+    font-size: 0.9rem;
+  }
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  }
+  .progress {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 18px;
+    font-size: 0.9rem;
+    color: var(--sub);
+  }
+  .progress-bar {
+    height: 6px;
+    background: var(--card2);
+    border-radius: 3px;
+    overflow: hidden;
+    margin-bottom: 18px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #38bdf8, #818cf8);
+    transition: width 0.4s ease;
+  }
+  .question {
+    font-size: 1.15rem;
+    font-weight: 600;
+    margin-bottom: 22px;
+    line-height: 1.5;
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 20px;
+  }
+  .option {
+    background: var(--card2);
+    border: 2px solid transparent;
+    color: var(--text);
+    padding: 14px 18px;
+    border-radius: 10px;
+    text-align: left;
+    font-size: 0.98rem;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-family: inherit;
+    line-height: 1.45;
+  }
+  .option:hover:not(:disabled) {
+    background: #3f526b;
+    border-color: var(--accent);
+  }
+  .option:disabled {
+    cursor: not-allowed;
+    opacity: 0.85;
+  }
+  .option.correct {
+    background: rgba(34, 197, 94, 0.18);
+    border-color: var(--correct);
+    color: #bbf7d0;
+  }
+  .option.wrong {
+    background: rgba(239, 68, 68, 0.18);
+    border-color: var(--wrong);
+    color: #fecaca;
+  }
+  .option.dim {
+    opacity: 0.55;
+  }
+  .option-label {
+    font-weight: 700;
+    margin-right: 8px;
+    color: var(--accent);
+  }
+  .option.correct .option-label { color: var(--correct); }
+  .option.wrong .option-label { color: var(--wrong); }
+  .explanation {
+    background: rgba(56, 189, 248, 0.08);
+    border-left: 4px solid var(--accent);
+    padding: 16px 18px;
+    border-radius: 8px;
+    margin-bottom: 18px;
+    font-size: 0.95rem;
+    line-height: 1.65;
+  }
+  .explanation-title {
+    font-weight: 700;
+    margin-bottom: 6px;
+    color: var(--accent);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .verdict {
+    font-weight: 700;
+    margin-bottom: 12px;
+    font-size: 1rem;
+  }
+  .verdict.correct { color: var(--correct); }
+  .verdict.wrong { color: var(--wrong); }
+  .actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+  }
+  .btn {
+    background: var(--accent);
+    color: #0f172a;
+    border: none;
+    padding: 11px 22px;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    font-family: inherit;
+    transition: transform 0.1s, background 0.2s;
+  }
+  .btn:hover { background: #7dd3fc; }
+  .btn:active { transform: scale(0.97); }
+  .btn.secondary {
+    background: var(--card2);
+    color: var(--text);
+  }
+  .btn.secondary:hover { background: #475569; }
+  .btn.warn {
+    background: var(--warn);
+    color: #0f172a;
+  }
+  .btn.warn:hover { background: #fbbf24; }
+  .btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+  }
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+    margin: 22px 0;
+  }
+  .stat {
+    background: var(--card2);
+    padding: 18px;
+    border-radius: 10px;
+    text-align: center;
+  }
+  .stat-value {
+    font-size: 2rem;
+    font-weight: 800;
+    margin-bottom: 4px;
+  }
+  .stat-label {
+    font-size: 0.85rem;
+    color: var(--sub);
+  }
+  .stat.correct .stat-value { color: var(--correct); }
+  .stat.wrong .stat-value { color: var(--wrong); }
+  .stat.score .stat-value { color: var(--accent); }
+  .summary-list {
+    background: var(--card2);
+    border-radius: 10px;
+    padding: 14px 18px;
+    margin-bottom: 22px;
+    max-height: 320px;
+    overflow-y: auto;
+  }
+  .summary-item {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.92rem;
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .summary-item:last-child { border-bottom: none; }
+  .summary-icon {
+    flex-shrink: 0;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.85rem;
+  }
+  .summary-icon.correct {
+    background: rgba(34, 197, 94, 0.2);
+    color: var(--correct);
+  }
+  .summary-icon.wrong {
+    background: rgba(239, 68, 68, 0.2);
+    color: var(--wrong);
+  }
+  .result-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .result-actions .btn { width: 100%; padding: 14px; }
+  footer {
+    text-align: center;
+    margin-top: 28px;
+    color: var(--sub);
+    font-size: 0.8rem;
+  }
+  @media (max-width: 600px) {
+    body { padding: 12px; }
+    .card { padding: 20px; }
+    .question { font-size: 1.05rem; }
+    .stats { grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
+    .stat { padding: 12px 6px; }
+    .stat-value { font-size: 1.5rem; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>AI 디지털 대전환 시대 — 미래인재 양성 퀴즈</h1>
+      <p>OECD Digital Education Outlook 2026 &amp; 학교장의 전략적 리더십</p>
+    </header>
+
+    <div id="app" class="card"></div>
+
+    <footer>총 10문항 · 4지선다 · 학습용 콘텐츠</footer>
+  </div>
+
+<script>
+const QUESTIONS = [
+  {
+    q: "OECD가 2026년 1월 발간한 보고서의 정식 명칭으로 가장 가까운 것은?",
+    options: [
+      "Digital Education Outlook 2026: Exploring Effective Uses of Generative AI in Education",
+      "Future of Education and Skills 2030",
+      "AI in Schools: A Global Policy Review 2026",
+      "Education at a Glance 2026: Generative AI Edition"
+    ],
+    answer: 0,
+    explanation: "OECD가 2026년 1월 발간한 보고서의 정식 명칭은 『Digital Education Outlook 2026: Exploring Effective Uses of Generative AI in Education』입니다. 본 강의 전체를 관통하는 거시적 나침반 역할을 합니다."
+  },
+  {
+    q: "강의에서 제시한 AGI 5단계 중, 현재 우리가 '진입 중'인 단계와 그 명칭은?",
+    options: [
+      "2단계 — 추론가(Reasoner)",
+      "3단계 — 에이전트(Agent)",
+      "4단계 — 혁신가(Innovator)",
+      "5단계 — 조직(Organization)"
+    ],
+    answer: 1,
+    explanation: "우리는 2단계(추론가)를 지나 3단계 '에이전트(Agent)'로 진입하는 길목에 있습니다. 에이전트는 사람을 대신해 며칠짜리 업무를 스스로 수행하는 단계이며, 오늘 입학한 학생이 졸업할 무렵에는 일상이 되어 있을 가능성이 큽니다."
+  },
+  {
+    q: "튀르키예의 ChatGPT-4 현장 실험 결과에 대한 설명으로 옳은 것은?",
+    options: [
+      "AI를 자유롭게 쓴 학생은 장기적으로도 비사용 학생보다 점수가 높게 유지되었다.",
+      "튜터링 버전 AI는 단기 성과를 17% 향상시켰지만 차단 후에는 효과가 사라졌다.",
+      "AI 사용을 차단한 뒤 시험을 보게 했더니, AI를 쓴 학생들의 점수가 AI를 한 번도 쓰지 않은 학생보다 17% 더 낮았다.",
+      "AI 사용 그룹과 미사용 그룹 사이에 통계적으로 유의한 차이가 발견되지 않았다."
+    ],
+    answer: 2,
+    explanation: "ChatGPT-4를 자유롭게 쓴 학생은 단기 성과가 48%(표준)~127%(튜터링) 상승했지만, AI 사용을 차단한 뒤 다시 시험을 보았을 때는 한 번도 쓰지 않은 학생보다 17% 더 낮은 점수를 기록했습니다. → '답을 대신 주는 AI'는 인지적 노력을 대체하여 깊은 학습을 저해합니다."
+  },
+  {
+    q: "OECD가 인용한 영국 중등 과학 교사 연구에서, 생성형 AI 보조도구 사용으로 수업·자료 준비 시간이 평균 몇 % 단축되었는가?",
+    options: ["17%", "31%", "48%", "127%"],
+    answer: 1,
+    explanation: "영국 중등 과학 교사 연구에서 생성형 AI 보조도구를 사용한 교사는 수업·자료 준비 시간을 평균 31% 단축했습니다. 또한 경험이 적은 튜터가 AI 보조를 받았을 때 학생 합격률이 9%p 상승했습니다."
+  },
+  {
+    q: "교육부 『AI for All』(2025.11.)이 제시한 핵심 인재상 '호모 심비우스(Homo Symbious)'의 의미로 가장 적절한 것은?",
+    options: [
+      "AI를 도구로 능숙하게 사용하는 디지털 네이티브",
+      "AI 기술 개발을 주도하는 최상위 전문가 집단",
+      "인간과 인공지능이 유기적으로 공존하고 협력하는 존재",
+      "AI 위험으로부터 사회를 보호하는 윤리 감시자"
+    ],
+    answer: 2,
+    explanation: "호모 심비우스(Homo Symbious)는 '인간과 인공지능이 유기적으로 공존하고 협력하는 존재'를 의미합니다. AI 네이티브 세대가 해외 빅테크의 '기술 소비자'가 아니라 주도적·윤리적으로 기술을 통제하며 새로운 부가가치를 창출하는 '창조자'로 자라야 한다는 철학을 담고 있습니다."
+  },
+  {
+    q: "「초·중등교육법」 제29조의2(학습지원 SW 관련)에 대한 설명으로 옳은 것은?",
+    options: [
+      "2024.8.14. 신설되어 2025.3.1.부터 시행된다.",
+      "2025.8.14. 신설되어 2026.3.1.부터 시행되며, 학교장은 학운위 심의를 거쳐야 한다.",
+      "교사가 행정업무용으로 학생 개인정보 수집 없이 활용하는 SW도 모두 심의 대상이다.",
+      "학교운영위원회의 심의 없이 교육부장관이 단독으로 기준을 정한다."
+    ],
+    answer: 1,
+    explanation: "「초·중등교육법」 제29조의2는 2025.8.14. 신설, 2026.3.1. 시행됩니다. 학교장은 학습지원 SW를 교육자료로 선정할 때 교육부장관이 개인정보보호위원회와 협의하여 정한 기준에 따라야 하며, '학교운영위원회의 심의'를 거쳐야 합니다. 교사가 학생 개인정보 수집 없이 수업 준비·행정업무용으로 활용하는 SW는 심의 대상이 아닙니다."
+  },
+  {
+    q: "다음 중 학습지원 SW 학운위 심의 4단계 절차의 '순서'가 올바르게 나열된 것은?",
+    options: [
+      "기준 충족 확인 → 의견 수렴 → 안건 상정·심의 → 최종 확정",
+      "의견 수렴 → 기준 충족 확인 → 안건 상정·심의 → 최종 확정",
+      "안건 상정·심의 → 의견 수렴 → 기준 충족 확인 → 최종 확정",
+      "의견 수렴 → 안건 상정·심의 → 기준 충족 확인 → 최종 확정"
+    ],
+    answer: 1,
+    explanation: "학운위 심의 4단계 절차는 ① 의견 수렴(교과협의회 등을 통한 교원 의견 수렴) → ② 기준 충족 확인(필수+선택 기준 체크리스트, 에듀집 활용 권장) → ③ 안건 상정·심의 → ④ 최종 확정 순서입니다."
+  },
+  {
+    q: "이선 몰릭(Ethan Mollick)이 『듀얼 브레인(Co-Intelligence)』에서 제시한 'AI와 협업하는 4가지 원칙'에 해당하지 않는 것은?",
+    options: [
+      "작업할 때 항상 AI를 초대한다",
+      "인간이 주요 과정에 계속 개입한다(Human-in-the-loop)",
+      "AI의 결정을 신뢰하고 가능한 한 자동화에 위임한다",
+      "지금의 AI를 '앞으로 사용할 가장 형편없는 AI'라고 생각한다"
+    ],
+    answer: 2,
+    explanation: "이선 몰릭의 4가지 원칙은 ① 항상 AI를 초대하기, ② 인간이 주요 과정에 계속 개입(Human-in-the-loop), ③ AI를 사람처럼 대하고 어떤 유형인지 알려주기, ④ 지금의 AI를 '앞으로 사용할 가장 형편없는 AI'로 여기기 입니다. '자동화에 위임'은 오히려 OECD와 몰릭이 공통적으로 경계하는 태도입니다."
+  },
+  {
+    q: "『제2차 정보교육 종합계획』에 따른 중학교 정보교육 시수 변화로 옳은 것은? (2026년 이후·AI 중점학교 기준)",
+    options: [
+      "17시간 → 34시간",
+      "34시간 → 68~102시간 이상 + (가칭)'정보 프로젝트 실습' 신설",
+      "34시간을 그대로 유지하되 학교 자율 운영",
+      "선택 자율 → 매 학기 1과목 이상 필수 편성"
+    ],
+    answer: 1,
+    explanation: "중학교는 2015 개정 34시간에서 2026년 이후 AI 중점학교 기준 68~102시간 이상으로 확대되며, (가칭) '정보 프로젝트 실습' 신설 과목이 추가됩니다. 초등학교는 17→34시간(일반)/68시간 이상(중점학교), 고등학교는 '정보' 또는 '인공지능 기초' 학교지정 필수 + 매 학기 1과목 이상 편성으로 바뀝니다."
+  },
+  {
+    q: "OECD가 정책결정자에게 제시한 5가지 권고 중, 강의가 '거버넌스가 기술보다 먼저'라는 메시지로 강조한 핵심 원칙은?",
+    options: [
+      "국제 협력과 모범사례 교류를 통해 함께 해법을 찾을 것",
+      "인간 판단·피드백·감독을 AI 활용의 중심에 둘 것(Human-in-the-loop)",
+      "교사 역량을 강화하여 AI를 자신감 있게 다룰 수 있게 할 것",
+      "AI의 적절한 활용에 관한 분명하고 실용적인 가이드를 제공할 것"
+    ],
+    answer: 1,
+    explanation: "OECD가 정책결정자에게 보낸 5가지 권고의 1번이자 '거버넌스가 기술보다 먼저'라는 메시지의 핵심은 '인간 판단·피드백·감독을 AI 활용의 중심에 둘 것(Human-in-the-loop)'입니다. 이는 이선 몰릭의 두 번째 원칙과 정확히 일치하며, '결정은 내가 한다. 단, AI를 결정 직전까지 적극적으로 초대한다'는 학교장의 행동 강령으로 번역됩니다."
+  }
+];
+
+const state = {
+  pool: [],         // indices into QUESTIONS for the current run
+  current: 0,       // pointer within pool
+  answered: false,
+  results: {},      // questionIndex -> { selected, correct }
+  mode: "full"      // "full" or "retry"
+};
+
+const $app = document.getElementById("app");
+
+function startQuiz(indices, mode) {
+  state.pool = indices.slice();
+  state.current = 0;
+  state.answered = false;
+  state.results = {};
+  state.mode = mode || "full";
+  render();
+}
+
+function render() {
+  if (state.current >= state.pool.length) {
+    renderResults();
+    return;
+  }
+  const qIdx = state.pool[state.current];
+  const q = QUESTIONS[qIdx];
+  const total = state.pool.length;
+  const num = state.current + 1;
+  const pct = ((num - 1) / total) * 100;
+
+  $app.innerHTML = `
+    <div class="progress">
+      <span>문제 ${num} / ${total}${state.mode === "retry" ? " · 틀린 문제 다시 풀기" : ""}</span>
+      <span>원문 번호 Q${qIdx + 1}</span>
+    </div>
+    <div class="progress-bar"><div class="progress-fill" style="width:${pct}%"></div></div>
+    <div class="question">${escapeHtml(q.q)}</div>
+    <div class="options" id="options">
+      ${q.options.map((opt, i) => `
+        <button class="option" data-i="${i}">
+          <span class="option-label">${String.fromCharCode(65 + i)}.</span>${escapeHtml(opt)}
+        </button>
+      `).join("")}
+    </div>
+    <div id="feedback"></div>
+  `;
+
+  document.querySelectorAll(".option").forEach(btn => {
+    btn.addEventListener("click", () => handleAnswer(parseInt(btn.dataset.i, 10)));
+  });
+}
+
+function handleAnswer(selected) {
+  if (state.answered) return;
+  state.answered = true;
+  const qIdx = state.pool[state.current];
+  const q = QUESTIONS[qIdx];
+  const isCorrect = selected === q.answer;
+  state.results[qIdx] = { selected, correct: isCorrect };
+
+  document.querySelectorAll(".option").forEach((btn, i) => {
+    btn.disabled = true;
+    if (i === q.answer) btn.classList.add("correct");
+    else if (i === selected) btn.classList.add("wrong");
+    else btn.classList.add("dim");
+  });
+
+  const isLast = state.current === state.pool.length - 1;
+  const feedback = document.getElementById("feedback");
+  feedback.innerHTML = `
+    <div class="verdict ${isCorrect ? "correct" : "wrong"}">
+      ${isCorrect ? "✓ 정답입니다!" : "✗ 오답입니다."}
+    </div>
+    <div class="explanation">
+      <div class="explanation-title">해설</div>
+      <div>${escapeHtml(q.explanation)}</div>
+    </div>
+    <div class="actions">
+      <button class="btn" id="next-btn">
+        ${isLast ? "결과 보기 →" : "다음 문제 →"}
+      </button>
+    </div>
+  `;
+  document.getElementById("next-btn").addEventListener("click", next);
+}
+
+function next() {
+  state.current += 1;
+  state.answered = false;
+  render();
+}
+
+function renderResults() {
+  const entries = state.pool.map(idx => ({
+    idx,
+    result: state.results[idx]
+  }));
+  const correctCount = entries.filter(e => e.result && e.result.correct).length;
+  const wrongCount = entries.length - correctCount;
+  const score = Math.round((correctCount / entries.length) * 100);
+
+  const wrongIndices = entries.filter(e => !e.result.correct).map(e => e.idx);
+
+  let msg = "";
+  if (score === 100) msg = "🎉 완벽합니다! 모든 문제를 맞히셨습니다.";
+  else if (score >= 80) msg = "👏 훌륭한 성적입니다!";
+  else if (score >= 60) msg = "👍 좋습니다. 조금만 더 보완하시면 됩니다.";
+  else msg = "📚 핵심 개념을 다시 한 번 정리해 보시기를 권합니다.";
+
+  $app.innerHTML = `
+    <div style="text-align:center; margin-bottom: 16px;">
+      <h2 style="margin:0 0 8px; color: var(--accent);">퀴즈 결과</h2>
+      <p style="margin:0; color: var(--sub); font-size: 0.95rem;">${msg}</p>
+    </div>
+
+    <div class="stats">
+      <div class="stat score">
+        <div class="stat-value">${score}<span style="font-size:1rem">점</span></div>
+        <div class="stat-label">최종 점수</div>
+      </div>
+      <div class="stat correct">
+        <div class="stat-value">${correctCount}</div>
+        <div class="stat-label">맞힌 문제</div>
+      </div>
+      <div class="stat wrong">
+        <div class="stat-value">${wrongCount}</div>
+        <div class="stat-label">틀린 문제</div>
+      </div>
+    </div>
+
+    <h3 style="margin: 8px 0 10px; font-size: 1rem;">문항별 결과</h3>
+    <div class="summary-list">
+      ${entries.map((e, i) => `
+        <div class="summary-item">
+          <span class="summary-icon ${e.result.correct ? "correct" : "wrong"}">
+            ${e.result.correct ? "✓" : "✗"}
+          </span>
+          <div>
+            <div style="font-weight:600; margin-bottom:2px;">
+              Q${e.idx + 1}. ${escapeHtml(truncate(QUESTIONS[e.idx].q, 70))}
+            </div>
+            <div style="color: var(--sub); font-size: 0.85rem;">
+              ${e.result.correct
+                ? `정답: ${String.fromCharCode(65 + QUESTIONS[e.idx].answer)}`
+                : `선택: ${String.fromCharCode(65 + e.result.selected)} · 정답: ${String.fromCharCode(65 + QUESTIONS[e.idx].answer)}`}
+            </div>
+          </div>
+        </div>
+      `).join("")}
+    </div>
+
+    <div class="result-actions">
+      <button class="btn warn" id="retry-wrong" ${wrongCount === 0 ? "disabled" : ""}>
+        ↻ 틀린 문제만 다시 풀기 (${wrongCount}문항)
+      </button>
+      <button class="btn" id="retry-all">
+        ⟳ 전체 다시 풀기 (10문항)
+      </button>
+    </div>
+  `;
+
+  document.getElementById("retry-all").addEventListener("click", () => {
+    startQuiz(range(QUESTIONS.length), "full");
+  });
+  const retryWrongBtn = document.getElementById("retry-wrong");
+  if (!retryWrongBtn.disabled) {
+    retryWrongBtn.addEventListener("click", () => startQuiz(wrongIndices, "retry"));
+  }
+}
+
+function range(n) {
+  return Array.from({ length: n }, (_, i) => i);
+}
+function truncate(s, n) {
+  return s.length > n ? s.slice(0, n) + "…" : s;
+}
+function escapeHtml(s) {
+  return String(s)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
+// Start
+startQuiz(range(QUESTIONS.length), "full");
+</script>
+</body>
+</html>
